@@ -21,7 +21,7 @@ const (
 )
 
 func usage() {
-	fmt.Printf("Usage: %s [OPTIONS] DOMAIN\n", os.Args[0])
+	fmt.Printf("Usage: %s [OPTIONS] DOMAIN [DOMAIN] ...\n", os.Args[0])
 	fmt.Printf("Options:\n")
 	flag.PrintDefaults()
 	fmt.Printf("\nIssues:\n  https://github.com/cdzombak/hosts-timer/issues/new\n")
@@ -29,29 +29,31 @@ func usage() {
 }
 
 func main() {
-	flag_disable := flag.Bool("disable", false, "Disable access to the domain. " +
+	flag_disable := flag.Bool("disable", false, "Disable access to the domain(s). " +
 		"(Cannot be used with -enable or -time.)")
 	flag_install := flag.Bool("install", false, "alias for -disable")
-	flag_enable := flag.Bool("enable", false, "(Re-)Enable access to the domain, indefinitely. " +
+	flag_enable := flag.Bool("enable", false, "(Re-)Enable access to the domain(s), indefinitely. " +
 		"(Cannot be used with -disable or -time).")
 	flag_uninstall := flag.Bool("uninstall", false, "alias for -enable")
-	flag_time := flag.String("time", "", "Enable access to the domain for the given amount of time " +
+	flag_time := flag.String("time", "", "Enable access to the domain(s) for the given amount of time " +
 		"(string like 1h5m30s). Access is disabled after that time, or when the process receives SIGINT/SIGTERM " +
 		"(eg. Ctrl-C). Cannot be used with -enable or -disable.")
 	flag.Usage = usage
 	flag.Parse()
-	if len(flag.Args()) != 1 {
-		flag.Usage()
-		os.Exit(usageExit)
+
+	var domains []string
+	for _, d := range flag.Args() {
+		d = strings.ToLower(d)
+		if strings.HasPrefix(d, "www.") {
+			d = d[4:]
+		}
+		if d != "" {
+			domains = append(domains, d)
+			domains = append(domains, "www." + d)
+		}
 	}
 
-	// TODO(cdzombak): accept list of domains on cli
-	domain := flag.Args()[0]
-	domain = strings.ToLower(domain)
-	if strings.HasPrefix(domain, "www.") {
-		domain = domain[4:]
-	}
-	if domain == "" {
+	if len(domains) == 0 {
 		flag.Usage()
 		os.Exit(usageExit)
 	}
@@ -67,13 +69,13 @@ func main() {
 			flag.Usage()
 			os.Exit(usageExit)
 		}
-		disableDomain(hosts, domain)
+		disableDomains(hosts, domains)
 	} else if *flag_enable || *flag_uninstall {
 		if *flag_disable || *flag_install {
 			flag.Usage()
 			os.Exit(usageExit)
 		}
-		enableDomain(hosts, domain)
+		enableDomains(hosts, domains)
 	} else if *flag_time != "" {
 		if *flag_disable || *flag_install || *flag_enable || *flag_uninstall {
 			flag.Usage()
@@ -84,31 +86,31 @@ func main() {
 			fmt.Println(err)
 			os.Exit(usageExit)
 		}
-		timedEnable(hosts, domain, duration)
+		timedEnable(hosts, domains, duration)
 	} else {
 		flag.Usage()
 		os.Exit(usageExit)
 	}
 }
 
-func disableDomain(hosts *txeh.Hosts, domain string) {
-	hosts.AddHosts(blockedAddrIPv4, []string{domain, "www."+domain})
+func disableDomains(hosts *txeh.Hosts, domains []string) {
+	hosts.AddHosts(blockedAddrIPv4, domains)
 	if err := hosts.Save(); err != nil {
 		fmt.Println(err)
 		os.Exit(hostsErrExit)
 	}
 }
 
-func enableDomain(hosts *txeh.Hosts, domain string) {
-	hosts.RemoveHosts([]string{domain, "www."+domain})
+func enableDomains(hosts *txeh.Hosts, domains []string) {
+	hosts.RemoveHosts(domains)
 	if err := hosts.Save(); err != nil {
 		fmt.Println(err)
 		os.Exit(hostsErrExit)
 	}
 }
 
-func timedEnable(hosts *txeh.Hosts, domain string, duration time.Duration) {
-	enableDomain(hosts, domain)
+func timedEnable(hosts *txeh.Hosts, domains []string, duration time.Duration) {
+	enableDomains(hosts, domains)
 
 	finishUpMutex := sync.Mutex{}
 	finishUp := func() {
@@ -117,7 +119,7 @@ func timedEnable(hosts *txeh.Hosts, domain string, duration time.Duration) {
 			fmt.Println(err)
 			os.Exit(hostsErrExit)
 		}
-		disableDomain(hosts, domain)
+		disableDomains(hosts, domains)
 		os.Exit(0)
 	}
 
