@@ -21,7 +21,7 @@ const (
 )
 
 func usage() {
-	fmt.Printf("Usage: %s [OPTIONS] DOMAIN [DOMAIN] ...\n", os.Args[0])
+	fmt.Printf("Usage: %s [OPTIONS] DOMAIN [DOMAIN] [...]\n", os.Args[0])
 	fmt.Printf("Options:\n")
 	flag.PrintDefaults()
 	fmt.Printf("\nIssues:\n  https://github.com/cdzombak/hosts-timer/issues/new\n")
