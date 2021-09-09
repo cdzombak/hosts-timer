@@ -62,6 +62,12 @@ function use-twitter() {
 }
 ```
 
+### Alfred helpers
+
+Install the [included Alfred helpers](https://github.com/cdzombak/hosts-timer/tree/main/alfred), and then you can use Alfred to enable Twitter or Facebook for a given amount of time (default 5 minutes).
+
+![Screenshot of Alfred helper for Twitter](https://github.com/cdzombak/hosts-timer/raw/main/alfred/screenshot.png)
+
 ### Create `/etc/sudoers.d/hosts-timer`
 
 ```
