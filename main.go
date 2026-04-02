@@ -52,9 +52,7 @@ func main() {
 	var domains []string
 	for _, d := range flag.Args() {
 		d = strings.ToLower(d)
-		if strings.HasPrefix(d, "www.") {
-			d = d[4:]
-		}
+		d = strings.TrimPrefix(d, "www.")
 		if d != "" {
 			domains = append(domains, d)
 			domains = append(domains, "www." + d)
