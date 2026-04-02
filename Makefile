@@ -1,5 +1,8 @@
 SHELL:=/usr/bin/env bash
 
+BIN_NAME:=hosts-timer
+BIN_VERSION:=$(shell ./.version.sh)
+
 default: help
 
 # via https://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
@@ -14,8 +17,8 @@ clean: ## Remove built products in ./out
 .PHONY: build
 build: clean ## Build (for the current platform & architecture) to ./out
 	mkdir -p out
-	go build -o ./out/hosts-timer .
+	go build -ldflags="-X main.version=${BIN_VERSION}" -o ./out/${BIN_NAME} .
 
 .PHONY: install
 install: ## Build & install hosts-timer to /usr/local/bin
-	go build -o /usr/local/bin/hosts-timer .
+	go build -ldflags="-X main.version=${BIN_VERSION}" -o /usr/local/bin/${BIN_NAME} .
