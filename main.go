@@ -13,6 +13,8 @@ import (
 	"github.com/txn2/txeh"
 )
 
+var version = "<dev>"
+
 const (
 	usageExit = 1
 	hostsErrExit = 2
@@ -38,8 +40,14 @@ func main() {
 	flag_time := flag.String("time", "", "Enable access to the domain(s) for the given amount of time " +
 		"(string like 1h5m30s). Access is disabled after that time, or when the process receives SIGINT/SIGTERM " +
 		"(eg. Ctrl-C). Cannot be used with -enable or -disable.")
+	flag_version := flag.Bool("version", false, "Print version and exit.")
 	flag.Usage = usage
 	flag.Parse()
+
+	if *flag_version {
+		fmt.Printf("hosts-timer %s\n", version)
+		os.Exit(0)
+	}
 
 	var domains []string
 	for _, d := range flag.Args() {
