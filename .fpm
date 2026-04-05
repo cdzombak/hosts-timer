@@ -3,4 +3,4 @@
 --description "Block websites with /etc/hosts and re-enable them on demand for a specified time"
 --url "https://github.com/cdzombak/hosts-timer"
 --maintainer "Chris Dzombak <https://www.dzombak.com>"
---license ISC
+--license GPL-3.0
