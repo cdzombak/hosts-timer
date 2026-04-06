@@ -4,7 +4,39 @@ Block websites on your system with `/etc/hosts`, and re-enable them on demand fo
 
 ## Installation
 
-Requires Go to be installed (tested with Go 1.15.x).
+### macOS via Homebrew
+
+```shell
+brew install cdzombak/oss/hosts-timer
+```
+
+### Debian via apt repository
+
+[Install my Debian repository](https://www.dzombak.com/blog/2025/06/updated-instructions-for-installing-my-debian-package-repositories/) if you haven't already:
+
+```shell
+sudo mkdir -p /etc/apt/keyrings
+curl -fsSL https://dist.cdzombak.net/keys/dist-cdzombak-net.gpg -o /etc/apt/keyrings/dist-cdzombak-net.gpg
+sudo chmod 644 /etc/apt/keyrings/dist-cdzombak-net.gpg
+sudo mkdir -p /etc/apt/sources.list.d
+sudo curl -fsSL https://dist.cdzombak.net/cdzombak-oss.sources -o /etc/apt/sources.list.d/cdzombak-oss.sources
+sudo chmod 644 /etc/apt/sources.list.d/cdzombak-oss.sources
+sudo apt update
+```
+
+Then install `hosts-timer` via `apt-get`:
+
+```shell
+sudo apt-get install hosts-timer
+```
+
+### Manual installation from build artifacts
+
+Pre-built binaries for Linux and macOS on various architectures are downloadable from each [GitHub Release](https://github.com/cdzombak/hosts-timer/releases). Debian packages for each release are available as well.
+
+### From source
+
+Requires Go to be installed:
 
 ```shell script
 git clone https://github.com/cdzombak/hosts-timer.git
